@@ -1,6 +1,5 @@
 from pathlib import Path
-from email import policy
-from email.parser import BytesParser
+from src.data.email_parser import parse_email_bytes
 
 import pandas as pd
 
@@ -29,70 +28,15 @@ CATEGORY_TO_LABEL = {
 
 
 # ---------------------------------------------------------
-# Extract text from an email
-# ---------------------------------------------------------
-
-def extract_body(message):
-    """
-    Extract human-readable text from an email.
-
-    We keep text/plain and text/html parts.
-    Non-text MIME parts are ignored.
-    """
-
-    text_parts = []
-
-    if message.is_multipart():
-
-        for part in message.walk():
-
-            content_type = part.get_content_type()
-
-            if content_type not in ("text/plain", "text/html"):
-                continue
-
-            try:
-                content = part.get_content()
-
-                if content:
-                    text_parts.append(content)
-
-            except Exception:
-                continue
-
-    else:
-
-        content_type = message.get_content_type()
-
-        if content_type in ("text/plain", "text/html"):
-
-            try:
-                content = message.get_content()
-
-                if content:
-                    text_parts.append(content)
-
-            except Exception:
-                pass
-
-    return "\n".join(text_parts).strip()
-
-
-# ---------------------------------------------------------
 # Process one email
 # ---------------------------------------------------------
 
 def process_email(email_file, category):
 
     with open(email_file, "rb") as file:
+        email_bytes = file.read()
 
-        message = BytesParser(
-            policy=policy.default
-        ).parse(file)
-
-    subject = message.get("Subject", "")
-
-    body = extract_body(message)
+    email_data = parse_email_bytes(email_bytes)
 
     label = CATEGORY_TO_LABEL[category]
 
@@ -100,8 +44,8 @@ def process_email(email_file, category):
         "id": email_file.name,
         "category": category,
         "label": label,
-        "subject": subject,
-        "body": body,
+        "subject": email_data["subject"],
+        "body": email_data["body"],
     }
 
 

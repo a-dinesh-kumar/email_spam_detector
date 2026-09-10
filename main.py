@@ -1,5 +1,13 @@
-from src.data.preprocess import clean_text
+from fastapi import FastAPI
 
-sample = """Limited offer!!! Buy now and get 50% discount."""
+from src.api.predict import router as predict_router
 
-print(clean_text(sample))
+
+app = FastAPI(
+    title="Email Spam Detection API",
+    description="API for detecting whether an email is HAM or SPAM.",
+    version="1.0.0"
+)
+
+
+app.include_router(predict_router)
