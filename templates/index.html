@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EmailGuard AI-powered email spam detection dashboard">
+    <title>EmailGuard | AI Email Security</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">🛡️</div>
+        <div>
+            <h1>EmailGuard</h1>
+            <span>AI Email Security</span>
+        </div>
+    </div>
+
+    <div class="header-actions">
+        <nav class="navigation" aria-label="Primary navigation">
+            <a href="#overview" class="nav-link active" data-section="overview">Overview</a>
+            <a href="#inbox" class="nav-link" data-section="inbox">Inbox</a>
+            <a href="#spam" class="nav-link" data-section="spam">Spam</a>
+        </nav>
+
+        <div class="header-tools">
+            <button id="refresh-button" class="icon-button" type="button" title="Refresh dashboard" aria-label="Refresh dashboard">
+                ↻
+            </button>
+
+            <a class="social-button" href="https://github.com/a-dinesh-kumar" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="GitHub">
+                <img src="/static/icons/github.png" alt="GitHub">
+            </a>
+
+            <a class="social-button" href="https://www.linkedin.com/in/dinesh-kumar-alagarsamy" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="LinkedIn">
+                <img src="/static/icons/linkedin.png" alt="LinkedIn">
+            </a>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- ================= OVERVIEW ================= -->
+    <section id="overview" class="section overview-section">
+        <div class="hero-copy">
+            <div>
+                <p class="eyebrow">AI-POWERED EMAIL SECURITY</p>
+                <h2>Protect your inbox with intelligent spam detection.</h2>
+                <p class="section-description">
+                    Analyze incoming emails, keep legitimate messages flowing, and isolate suspicious messages for review.
+                </p>
+            </div>
+            <div class="model-status">
+                <span class="status-dot"></span>
+                Model Online
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📨</div>
+                <div>
+                    <span class="stat-label">Emails Scanned</span>
+                    <strong id="emails-scanned">-</strong>
+                    <small>total processed</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📥</div>
+                <div>
+                    <span class="stat-label">Delivered</span>
+                    <strong id="emails-delivered">-</strong>
+                    <small>safe emails</small>
+                </div>
+            </div>
+
+            <div class="stat-card danger-card">
+                <div class="stat-icon">🚨</div>
+                <div>
+                    <span class="stat-label">Quarantined</span>
+                    <strong id="emails-quarantined">-</strong>
+                    <small>spam isolated</small>
+                </div>
+            </div>
+
+            <div class="stat-card accent-card">
+                <div class="stat-icon">📊</div>
+                <div>
+                    <span class="stat-label">Spam Rate</span>
+                    <strong id="spam-rate">-</strong>
+                    <small>of scanned emails</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CLASSIFIER ================= -->
+        <div class="classifier-card">
+            <div class="card-header">
+                <div>
+                    <p class="eyebrow">AI CLASSIFIER</p>
+                    <h2>Classify an Email</h2>
+                    <p>Analyze an email using the trained spam detection model.</p>
+                </div>
+                <div class="classifier-badge">Naive Bayes · NLP</div>
+            </div>
+
+            <form id="email-form">
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="Enter email subject">
+                </div>
+
+                <div class="form-group">
+                    <label for="body">Email Body</label>
+                    <textarea id="body" name="body" rows="8" placeholder="Paste the email content here..." required></textarea>
+                </div>
+
+                <div class="action-row">
+                    <button type="submit" id="classify-button" class="primary-button">
+                        <span>Classify Email</span>
+                    </button>
+
+                    <label class="upload-button">
+                        <span>📎 Upload .eml</span>
+                        <input type="file" id="email-file" accept=".eml,message/rfc822" hidden>
+                    </label>
+
+                    <button type="button" id="clear-button" class="secondary-button">
+                        Clear
+                    </button>
+                </div>
+
+                <div id="form-status" class="form-status hidden" role="status"></div>
+            </form>
+
+            <div id="classification-result" class="result-card hidden" role="status" aria-live="polite">
+                <div id="result-icon" class="result-icon"></div>
+                <div class="result-content">
+                    <span id="result-label"></span>
+                    <p id="result-message"></p>
+                </div>
+                <button type="button" id="result-target-button" class="result-link hidden"></button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= INBOX ================= -->
+    <section id="inbox" class="section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">DELIVERED EMAIL</p>
+                <h2>Inbox</h2>
+                <p class="section-description">
+                    Emails classified as HAM and delivered successfully.
+                </p>
+            </div>
+
+            <span id="inbox-count" class="section-count">0</span>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+
+                <tbody id="inbox-table">
+                    <tr>
+                        <td colspan="3" class="empty-state">
+                            No emails in inbox.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Inbox pagination -->
+        <div id="inbox-pagination" class="pagination"></div>
+    </section>
+
+    <!-- ================= SPAM ================= -->
+    <section id="spam" class="section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">SPAM PROTECTION</p>
+                <h2>Spam / Quarantine</h2>
+                <p class="section-description">
+                    Suspicious emails are isolated here for review.
+                </p>
+            </div>
+
+            <span id="spam-count" class="section-count danger">0</span>
+        </div>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Status</th>
+                        <th>Timestamp</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="spam-table">
+                    <tr>
+                        <td colspan="4" class="empty-state">
+                            No quarantined emails.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Spam pagination -->
+        <div id="spam-pagination" class="pagination"></div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-left">
+        <strong>EmailGuard</strong>
+        <span>AI-powered email spam detection</span>
+    </div>
+    <div class="footer-center">Built by Dinesh Kumar</div>
+    <div class="footer-right">Spam Detection · NLP · FastAPI</div>
+</footer>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

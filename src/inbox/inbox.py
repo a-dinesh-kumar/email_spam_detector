@@ -19,14 +19,19 @@ def deliver_to_inbox(subject, body, status="ham"):
     record = {
         "id": str(datetime.now().strftime("%Y%m%d%H%M%S%f")),
         "timestamp": datetime.now().isoformat(timespec="seconds"),
-        "subject": subject,
-        "body": body,
+        "subject": subject or "",
+        "body": body or "",
         "label": "ham",
         "status": status,
     }
 
     if INBOX_FILE.exists():
-        df = pd.read_csv(INBOX_FILE,dtype={"id": str})
+        df = pd.read_csv(
+            INBOX_FILE,
+            dtype={"id": str},
+            keep_default_na=False
+        )
+
         df = pd.concat(
             [df, pd.DataFrame([record])],
             ignore_index=True
@@ -42,6 +47,7 @@ def deliver_to_inbox(subject, body, status="ham"):
 
     return record
 
+
 def get_inbox_emails():
     """
     Return emails currently delivered to the inbox.
@@ -50,7 +56,11 @@ def get_inbox_emails():
     if not INBOX_FILE.exists():
         return []
 
-    df = pd.read_csv(INBOX_FILE,dtype={"id": str})
+    df = pd.read_csv(
+        INBOX_FILE,
+        dtype={"id": str},
+        keep_default_na=False
+    )
 
     if df.empty:
         return []

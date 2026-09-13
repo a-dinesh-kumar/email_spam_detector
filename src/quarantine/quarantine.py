@@ -19,14 +19,19 @@ def quarantine_email(subject, body):
     record = {
         "id": str(datetime.now().strftime("%Y%m%d%H%M%S%f")),
         "timestamp": datetime.now().isoformat(timespec="seconds"),
-        "subject": subject,
-        "body": body,
+        "subject": subject or "",
+        "body": body or "",
         "label": "spam",
         "status": "quarantined",
     }
 
     if QUARANTINE_FILE.exists():
-        df = pd.read_csv(QUARANTINE_FILE,dtype={"id": str})
+        df = pd.read_csv(
+            QUARANTINE_FILE,
+            dtype={"id": str},
+            keep_default_na=False
+        )
+
         df = pd.concat(
             [df, pd.DataFrame([record])],
             ignore_index=True
@@ -42,6 +47,7 @@ def quarantine_email(subject, body):
 
     return record
 
+
 def get_quarantined_emails():
     """
     Return emails currently held in quarantine.
@@ -50,7 +56,11 @@ def get_quarantined_emails():
     if not QUARANTINE_FILE.exists():
         return []
 
-    df = pd.read_csv(QUARANTINE_FILE,dtype={"id": str})
+    df = pd.read_csv(
+        QUARANTINE_FILE,
+        dtype={"id": str},
+        keep_default_na=False
+    )
 
     if df.empty:
         return []
@@ -68,12 +78,16 @@ def release_email(email_id):
     if not QUARANTINE_FILE.exists():
         return None
 
-    df = pd.read_csv(QUARANTINE_FILE,dtype={"id": str})
+    df = pd.read_csv(
+        QUARANTINE_FILE,
+        dtype={"id": str},
+        keep_default_na=False
+    )
 
     if df.empty:
         return None
 
-    matches = df["id"].astype(str) == str(email_id)
+    matches = df["id"] == str(email_id)
 
     if not matches.any():
         return None

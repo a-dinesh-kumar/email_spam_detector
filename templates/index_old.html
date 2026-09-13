@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Email Spam Detection</title>
+
+    <link
+        rel="stylesheet"
+        href="/static/css/style.css"
+    >
+</head>
+
+<body>
+
+    <!-- ================= HEADER ================= -->
+
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-icon">🛡️</div>
+
+            <div>
+                <h1>EmailGuard</h1>
+                <span>AI Email Security</span>
+            </div>
+        </div>
+
+        <nav class="navigation">
+
+            <a href="#overview" class="nav-link active">
+                Overview
+            </a>
+
+            <a href="#inbox" class="nav-link">
+                Inbox
+            </a>
+
+            <a href="#spam" class="nav-link">
+                Spam
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="container">
+
+
+        <!-- ================= OVERVIEW ================= -->
+
+        <section id="overview" class="section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">DASHBOARD</p>
+                    <h2>Email Overview</h2>
+                    <p class="section-description">
+                        Monitor email classification and delivery activity.
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- Statistics -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">📨</div>
+
+                    <div>
+                        <span class="stat-label">
+                            Emails Scanned
+                        </span>
+
+                        <strong id="emails-scanned">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">📥</div>
+
+                    <div>
+                        <span class="stat-label">
+                            Delivered
+                        </span>
+
+                        <strong id="emails-delivered">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">🚨</div>
+
+                    <div>
+                        <span class="stat-label">
+                            Quarantined
+                        </span>
+
+                        <strong id="emails-quarantined">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon">📊</div>
+
+                    <div>
+                        <span class="stat-label">
+                            Spam Rate
+                        </span>
+
+                        <strong id="spam-rate">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= CLASSIFIER ================= -->
+
+            <div class="classifier-card">
+
+                <div class="card-header">
+
+                    <div>
+                        <p class="eyebrow">AI CLASSIFIER</p>
+
+                        <h2>
+                            Classify an Email
+                        </h2>
+
+                        <p>
+                            Analyze an email using the trained spam detection model.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <form id="email-form">
+
+                    <div class="form-group">
+
+                        <label for="subject">
+                            Subject
+                        </label>
+
+                        <input
+                            type="text"
+                            id="subject"
+                            name="subject"
+                            placeholder="Enter email subject"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="body">
+                            Email Body
+                        </label>
+
+                        <textarea
+                            id="body"
+                            name="body"
+                            rows="9"
+                            placeholder="Paste the email content here..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="action-row">
+
+                        <button
+                            type="submit"
+                            class="primary-button"
+                        >
+                            Classify Email
+                        </button>
+
+                        <label class="upload-button">
+
+                            📎 Upload .eml
+
+                            <input
+                                type="file"
+                                id="email-file"
+                                accept=".eml,message/rfc822"
+                                hidden
+                            >
+
+                        </label>
+
+                    </div>
+
+                </form>
+
+
+                <!-- Classification result -->
+
+                <div
+                    id="classification-result"
+                    class="result-card hidden"
+                >
+
+                    <div id="result-icon"></div>
+
+                    <div>
+                        <span id="result-label"></span>
+
+                        <p id="result-message"></p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= INBOX ================= -->
+
+        <section id="inbox" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">DELIVERED EMAIL</p>
+
+                    <h2>
+                        Inbox
+                    </h2>
+
+                    <p class="section-description">
+                        Emails classified as HAM and delivered successfully.
+                    </p>
+                </div>
+
+                <span
+                    id="inbox-count"
+                    class="section-count"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="inbox-table">
+
+                        <tr>
+                            <td colspan="3" class="empty-state">
+                                No emails in inbox.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ================= SPAM ================= -->
+
+        <section id="spam" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">SPAM PROTECTION</p>
+
+                    <h2>
+                        Spam / Quarantine
+                    </h2>
+
+                    <p class="section-description">
+                        Suspicious emails are isolated here for review.
+                    </p>
+                </div>
+
+                <span
+                    id="spam-count"
+                    class="section-count danger"
+                >
+                    0
+                </span>
+
+            </div>
+
+
+            <div class="table-card">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="spam-table">
+
+                        <tr>
+                            <td colspan="4" class="empty-state">
+                                No quarantined emails.
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-left">
+            <strong>EmailGuard</strong>
+            <span>AI-powered email spam detection</span>
+        </div>
+
+        <div class="footer-center">
+            Built by Dinesh Kumar
+        </div>
+
+        <div class="footer-links">
+
+            <a
+                href="https://github.com/a-dinesh-kumar"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                GitHub
+            </a>
+
+            <a
+                href="https://www.linkedin.com/in/dinesh-kumar-alagarsamy"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                LinkedIn
+            </a>
+
+        </div>
+
+    </footer>
+
+
+    <script src="/static/js/app.js"></script>
+
+</body>
+</html>
