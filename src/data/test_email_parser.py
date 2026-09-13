@@ -1,37 +1,27 @@
-from pathlib import Path
-
 from src.data.email_parser import parse_email_bytes
-
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
-EMAIL_FILE = (
-    PROJECT_ROOT
-    / "data"
-    / "raw"
-    / "spam"
-    / "0003.4b3d943b8df71af248d12f8b2e7a224a"
-)
 
 
 def main():
 
-    with open(EMAIL_FILE, "rb") as file:
-        email_bytes = file.read()
+    sample_email = b"""\
+From: sender@example.com
+To: receiver@example.com
+Subject: Test Email
 
-    email_data = parse_email_bytes(email_bytes)
+Hello, this is a test email.
+Please verify the parser.
+"""
 
-    print("=" * 60)
+    result = parse_email_bytes(sample_email)
+
     print("EMAIL PARSER TEST")
-    print("=" * 60)
+    print("Subject:", result["subject"])
+    print("Body:", result["body"])
 
-    print("\nSubject:")
-    print(email_data["subject"])
+    assert result["subject"] == "Test Email"
+    assert "Hello, this is a test email." in result["body"]
 
-    print("\nBody preview:")
-    print(email_data["body"][:500])
-
-    print("\nBody length:", len(email_data["body"]))
+    print("\nParser test passed.")
 
 
 if __name__ == "__main__":
