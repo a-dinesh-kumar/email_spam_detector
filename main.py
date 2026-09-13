@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 
 from src.api.predict import router as predict_router
+from src.api.management import router as management_router
+from src.api.overview import router as overview_router
 
 
 app = FastAPI(
@@ -9,5 +11,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-
 app.include_router(predict_router)
+app.include_router(management_router)
+app.include_router(overview_router)

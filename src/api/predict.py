@@ -4,7 +4,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException
 from pydantic import BaseModel
 
 from src.data.email_parser import parse_email_bytes
-from src.data.preprocess import clean_text
+from src.utils.classifier import classify_email
 
 
 MODEL_PATH = "models/spam_model.pkl"
@@ -25,20 +25,11 @@ class Email(BaseModel):
 @router.post("/predict")
 def predict_email(email: Email):
 
-    # Combine subject and body
-    text = email.subject + " " + email.body
-
-    # Apply the same preprocessing used during training
-    cleaned_text = clean_text(text)
-
-    # Convert text into model features
-    features = vectorizer.transform([cleaned_text])
-
-    # Predict
-    prediction = model.predict(features)[0]
+    result = classify_email(email.subject, email.body)
 
     return {
-        "prediction": prediction
+        "prediction": result["prediction"],
+        "status": result["status"]
     }
 
 
@@ -55,26 +46,19 @@ async def predict_email_file(file: UploadFile = File(...)):
     # Read uploaded file
     email_bytes = await file.read()
 
-    # Parse email using the shared parser
-    email_data = parse_email_bytes(email_bytes)
+    try:
+        email_data = parse_email_bytes(email_bytes)
+    except Exception as error:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unable to parse email file: {error}"
+        )
 
-    subject = email_data["subject"]
-    body = email_data["body"]
-
-    # Combine subject and body
-    text = subject + " " + body
-
-    # Same preprocessing as training
-    cleaned_text = clean_text(text)
-
-    # Convert to features
-    features = vectorizer.transform([cleaned_text])
-
-    # Predict
-    prediction = model.predict(features)[0]
+    result = classify_email(email_data["subject"],email_data["body"])
 
     return {
         "filename": file.filename,
-        "subject": subject,
-        "prediction": prediction
+        "subject": email_data["subject"],
+        "prediction": result["prediction"],
+        "status": result["status"]
     }
