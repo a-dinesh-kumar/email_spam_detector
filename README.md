@@ -7,7 +7,8 @@ The system classifies emails as **HAM (legitimate)** or **SPAM**,
 isolates spam messages in quarantine, and provides a web interface for
 classification and review.
 
-**Live application:** https://email-spam-detector-vlxv.onrender.com\
+**Live application:** https://email-spam-detector-vlxv.onrender.com
+
 **GitHub:** https://github.com/a-dinesh-kumar
 
 ------------------------------------------------------------------------
