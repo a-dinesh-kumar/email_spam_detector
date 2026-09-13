@@ -1,50 +1,46 @@
-from pathlib import Path
-
 from src.data.email_parser import parse_email_bytes
 from src.utils.classifier import classify_email
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SPAM_DIR = PROJECT_ROOT / "data" / "raw" / "spam"
-
-
 def main():
 
+    sample_email = b"""\
+From: marketing@example.com
+To: user@example.com
+Subject: Congratulations! You have won a FREE prize
+
+Congratulations!
+
+You have been selected to receive a FREE prize.
+Click here now to claim your reward.
+Limited time offer. Act immediately.
+"""
+
+    parsed_email = parse_email_bytes(sample_email)
+
     print("=" * 60)
-    print("REAL EMAIL CLASSIFIER ROUTING TEST")
+    print("CLASSIFIER ROUTING TEST")
     print("=" * 60)
 
-    # Pick the first real spam email from the dataset
-    spam_files = [
-        file for file in SPAM_DIR.iterdir()
-        if file.is_file()
-    ]
+    print("\nSubject:", parsed_email["subject"])
+    print("Body:", parsed_email["body"])
 
-    email_file = spam_files[10]
-
-    print(f"\nTesting file: {email_file.name}")
-
-    # Read raw .eml
-    with open(email_file, "rb") as file:
-        email_bytes = file.read()
-
-    # Parse using the same parser used by the API
-    email_data = parse_email_bytes(email_bytes)
-
-    print(f"Subject: {email_data['subject']}")
-
-    # Classify and route
     result = classify_email(
-        email_data["subject"],
-        email_data["body"]
+        parsed_email["subject"],
+        parsed_email["body"]
     )
 
     print("\nCLASSIFICATION RESULT")
     print(result)
 
-    print("\nCheck:")
-    print("data/quarantine/quarantine.csv")
-    print("for the quarantined email.")
+    assert result["prediction"] in ("ham", "spam")
+
+    if result["prediction"] == "spam":
+        assert result["status"] == "quarantined"
+    else:
+        assert result["status"] == "delivered"
+
+    print("\nClassifier routing test passed.")
 
 
 if __name__ == "__main__":
